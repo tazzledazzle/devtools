@@ -36,12 +36,12 @@ services:
       - chroma-data:/chroma/chroma
 
   # Optional: for ingest embeddings and crew LLM. Uncomment to use.
-  # ollama:
-  #   image: ollama/ollama:latest
-  #   ports:
-  #     - "11434:11434"
-  #   volumes:
-  #     - ollama-data:/root/.ollama
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
 
 volumes:
   workspace:
