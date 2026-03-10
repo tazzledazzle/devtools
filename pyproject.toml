@@ -1,0 +1,24 @@
+[project]
+name = "fraud-detection-system"
+version = "0.1.0"
+description = "A Fraud Detection System using Machine Learning"
+authors = [
+    { name = "Terence Schumacher", email = "terenceschumacher@gmail.com" }
+    ]
+dependencies = [
+    "requests"
+]
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.pytest]
+addopts = "-v"
+
+[tool.black]
+line-length = 88
+target-version = ['py38']
+
+[tool.isort]
+profile = "black"
