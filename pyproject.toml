@@ -6,7 +6,9 @@ authors = [
     { name = "Terence Schumacher", email = "terenceschumacher@gmail.com" }
     ]
 dependencies = [
-    "requests"
+    "requests",
+    "confluent-kafka",
+    "boto3"
 ]
 
 [build-system]
