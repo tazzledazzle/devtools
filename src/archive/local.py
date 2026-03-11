@@ -1,39 +1,49 @@
-# add local backend
-# JSONL append model using pathlib, deterministic replay in
-# write order, and list returns stable event identifiers
-# (e.g. line numbers or UUIDs) for testing and replay purposes.
+# Local filesystem backend: JSONL append, list returns identifiers, replay in order.
 import json
 from pathlib import Path
+from typing import Any, Iterator, List
 
-class LocalArchiveStorage:
-    def __init__(self, file_path):
+from archive.storage import ArchiveStorage
+
+
+class LocalArchiveStorage(ArchiveStorage):
+    """Archive backend that appends events to a single JSONL file."""
+
+    def __init__(self, file_path: str | Path) -> None:
         self.file_path = Path(file_path)
         self.file_path.parent.mkdir(parents=True, exist_ok=True)
 
-    def write(self, event):
+    def write(self, event: dict[str, Any]) -> None:
         """Append an event to the archive as a JSON line."""
-        with self.file_path.open('a', encoding='utf-8') as f:
-            json_line = json.dumps(event)
-            f.write(json_line + '\n')
+        with self.file_path.open("a", encoding="utf-8") as f:
+            f.write(json.dumps(event) + "\n")
 
-    def list(self):
-        """List all events in the archive with their line numbers as identifiers."""
+    def list(self) -> List[str]:
+        """Return event identifiers (line numbers as strings) in replay order."""
         if not self.file_path.exists():
             return []
-
-        events = []
-        with self.file_path.open('r', encoding='utf-8') as f:
+        keys: List[str] = []
+        with self.file_path.open("r", encoding="utf-8") as f:
             for line_number, line in enumerate(f, start=1):
-                try:
-                    event = json.loads(line.strip())
-                    events.append((line_number, event))
-                except json.JSONDecodeError:
-                    continue  # skip malformed lines
-        return events
+                line = line.strip()
+                if line:
+                    try:
+                        json.loads(line)
+                        keys.append(str(line_number))
+                    except json.JSONDecodeError:
+                        continue
+        return keys
 
-    def replace(self, events):
-        """Replace all events in the archive with the given list of events."""
-        with self.file_path.open('w', encoding='utf-8') as f:
-            for event in events:
-                json_line = json.dumps(event)
-                f.write(json_line + '\n')
+    def replay(self) -> Iterator[dict[str, Any]]:
+        """Yield stored events in write order."""
+        if not self.file_path.exists():
+            return
+        with self.file_path.open("r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    yield json.loads(line)
+                except json.JSONDecodeError:
+                    continue

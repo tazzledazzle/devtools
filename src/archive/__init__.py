@@ -1,2 +1,4 @@
-# added package exports
-from .storage import Archive, ArchiveStorage
+from .local import LocalArchiveStorage
+from .storage import ArchiveStorage
+
+__all__ = ["ArchiveStorage", "LocalArchiveStorage"]
