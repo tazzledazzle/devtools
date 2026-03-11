@@ -5,14 +5,26 @@ Real-time feature processing topology built on faust-streaming.
 
 This module wires the shared ingestion topic into a Faust app and exposes a
 features topic that downstream consumers (decision engine, sinks, etc.) can
-subscribe to. Later plans will register concrete agents for velocity,
-geo-anomaly, and device-based features using the shared app and topics.
+subscribe to.
+
+Importing this module (and the side-effect-only ``realtime_velocity`` module)
+registers:
+
+* The shared Faust ``app`` instance.
+* The ingestion and feature topics.
+* The per-user velocity agent that emits ``FeatureEvent`` records with
+  ``velocity_1m`` and ``velocity_1h`` fields derived from the ingestion stream.
+
+Later plans will register additional agents for geo-anomaly and device-based
+features using the same shared app and topics.
 """
 
 import faust
 
 from .realtime_config import FEATURES_TOPIC, INGESTION_TOPIC, KAFKA_BROKER_URL
 from .realtime_models import FeatureEvent, IngestionEvent
+from . import realtime_geo  # noqa: F401  (register geo-anomaly agent)
+from . import realtime_velocity  # noqa: F401  -- register velocity tables and agent
 
 
 APP_NAME = "real-time-feature-processor"
