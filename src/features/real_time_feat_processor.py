@@ -7,24 +7,36 @@ This module wires the shared ingestion topic into a Faust app and exposes a
 features topic that downstream consumers (decision engine, sinks, etc.) can
 subscribe to.
 
-Importing this module (and the side-effect-only ``realtime_velocity`` module)
-registers:
+Importing this module (and the side-effect-only feature modules) registers:
 
 * The shared Faust ``app`` instance.
 * The ingestion and feature topics.
 * The per-user velocity agent that emits ``FeatureEvent`` records with
   ``velocity_1m`` and ``velocity_1h`` fields derived from the ingestion stream.
+* The geo-anomaly agent that tracks last-known locations and emits distance,
+  time delta, and anomaly flags.
+* The known/new device agent that tracks per-user devices in a changelog-
+  backed table and emits an ``is_new_device`` flag for each event.
 
-Later plans will register additional agents for geo-anomaly and device-based
-features using the same shared app and topics.
+Restart safety is provided by Faust's RocksDB-backed tables and Kafka
+changelog topics (via the ``faust-streaming[rocksdb]`` extra). To verify
+restart behavior manually:
+
+1. Start a local Kafka broker and run the worker:
+
+   ``faust -A src.features.real_time_feat_processor worker``
+
+2. Produce a few ingestion events for the same user/device.
+3. Stop the worker and then restart it with the same state directory.
+4. Send additional events for the same user/device and confirm that velocity,
+   geo, and device features continue from the preserved state instead of
+   recomputing from the beginning.
 """
 
 import faust
 
 from .realtime_config import FEATURES_TOPIC, INGESTION_TOPIC, KAFKA_BROKER_URL
 from .realtime_models import FeatureEvent, IngestionEvent
-from . import realtime_geo  # noqa: F401  (register geo-anomaly agent)
-from . import realtime_velocity  # noqa: F401  -- register velocity tables and agent
 
 
 APP_NAME = "real-time-feature-processor"
@@ -57,6 +69,12 @@ def get_topics() -> tuple[faust.Topic[IngestionEvent], faust.Topic[FeatureEvent]
     """Return the shared ingestion and features topics."""
 
     return ingestion_topic, features_topic
+
+
+# Import feature modules for their side-effect registration of tables and agents.
+from . import realtime_device  # noqa: F401
+from . import realtime_geo  # noqa: F401
+from . import realtime_velocity  # noqa: F401
 
 
 if __name__ == "__main__":
