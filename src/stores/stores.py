@@ -153,10 +153,20 @@ class RedisStatefulStore(StatefulStore):
 
 
 def get_default_feature_store() -> FeatureStores:
-    """Return a FeatureStores instance (Redis-backed) without exposing Redis details."""
+    """
+    Return a FeatureStores instance (Redis-backed) without exposing Redis details.
+
+    Uses a shared connection pool; safe to call from both the real-time processor
+    and online scoring/serving code without creating a new connection per call.
+    """
     return RedisFeatureStore()
 
 
 def get_default_stateful_store() -> StatefulStore:
-    """Return a StatefulStore instance (Redis-backed) without exposing Redis details."""
+    """
+    Return a StatefulStore instance (Redis-backed) without exposing Redis details.
+
+    Uses a shared connection pool; safe to call from both the real-time processor
+    and online scoring/serving code without creating a new connection per call.
+    """
     return RedisStatefulStore()
