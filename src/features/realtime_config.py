@@ -61,3 +61,8 @@ NEW_DEVICE_LOOKBACK_HOURS: Final[int] = int(
     _get_env("NEW_DEVICE_LOOKBACK_HOURS", "24")
 )
 
+# Cap the number of devices tracked per user to keep table state bounded.
+MAX_DEVICES_PER_USER: Final[int] = int(
+    _get_env("MAX_DEVICES_PER_USER", "20")
+)
+
