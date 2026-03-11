@@ -2,20 +2,14 @@ import unittest
 
 try:
     import boto3
+    from moto import mock_aws
+    from archive import S3ArchiveStorage
+    _S3_ARCHIVE_TEST_AVAILABLE = S3ArchiveStorage is not None
 except ImportError:
     boto3 = None
     mock_aws = None
     S3ArchiveStorage = None
     _S3_ARCHIVE_TEST_AVAILABLE = False
-else:
-    try:
-        from moto import mock_aws
-        from archive.s3_compat import S3ArchiveStorage
-        _S3_ARCHIVE_TEST_AVAILABLE = True
-    except ImportError:
-        mock_aws = None
-        S3ArchiveStorage = None
-        _S3_ARCHIVE_TEST_AVAILABLE = False
 
 
 def _maybe_mock_s3(cls):
