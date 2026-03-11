@@ -1,7 +1,17 @@
 import unittest
+from typing import Iterator
 
 from generators.schema import EventSources, REQUIRED_FIELDS, has_required_fields
 from generators.synthetic_payments import generate_synthetic_payments
+from sources.event_sources import EventSources as EventSourceABC
+
+
+class _DummyEventSource(EventSourceABC):
+    def __init__(self, events: list[dict]):
+        self._events = events
+
+    def events(self) -> Iterator[dict]:
+        return iter(self._events)
 
 
 class TestAll(unittest.TestCase):
@@ -10,6 +20,22 @@ class TestAll(unittest.TestCase):
         required_fields = {"user_id", "amount", "timestamp", "device_id", "location"}
         self.assertEqual(set(REQUIRED_FIELDS), required_fields)
         self.assertTrue(all(field in EventSources.__annotations__ for field in required_fields))
+
+    def test_event_sources_abc_can_be_subclassed_and_iterated(self):
+        """EventSources ABC can be subclassed and yields an iterator of dicts."""
+        payload = {
+            "user_id": "user_abc",
+            "amount": 12.34,
+            "timestamp": "2026-01-01T00:00:00+00:00",
+            "device_id": "ios_phone",
+            "location": "NYC",
+        }
+
+        source = _DummyEventSource([payload])
+        events = list(source.events())
+
+        self.assertEqual(events, [payload])
+        self.assertTrue(all(isinstance(event, dict) for event in events))
 
     def test_has_required_fields(self):
         payload = {
