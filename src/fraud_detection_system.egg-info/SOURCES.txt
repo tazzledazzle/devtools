@@ -18,4 +18,6 @@ src/ingestion/stream_ingester.py
 src/sources/event_sources.py
 src/stores/stores.py
 src/tests/test_all.py
+src/tests/test_archive_local.py
+src/tests/test_archive_s3.py
 src/utils/logging.py
