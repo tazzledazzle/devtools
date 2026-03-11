@@ -8,7 +8,7 @@ authors = [
 dependencies = [
     "requests",
     "confluent-kafka",
-    "boto3",
+    "boto3>=1.34.1",
     "pytest>=9.0.2",
 ]
 
