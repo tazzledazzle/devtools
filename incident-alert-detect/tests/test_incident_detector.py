@@ -51,3 +51,31 @@ def test_incidents_are_per_service():
     assert db_results == [None, None]
     assert detector.service_states["api"]["incident_active"] is True
     assert detector.service_states["db"]["incident_active"] is False
+
+def test_rate_based_trigger_fires_below_count_threshold():
+    detector = IncidentDetector(error_threshold=100, window_size=4, rate_threshold=0.5)
+    results = []
+    results.append(detector.process_event(1, "api", "ERROR"))  # 1 error, 0 success, total 1 < window
+    results.append(detector.process_event(1, "api", "SUCCESS"))  # 1 error, 1 success, total 2 < window
+    results.append(detector.process_event(1, "api", "ERROR"))  # 2 error, 1 success, total 3 < window
+    results.append(detector.process_event(1, "api", "SUCCESS"))  # 2 error, 2 success, total 4 == window, error rate = 0.5, should trigger
+    assert results == [None, None, None, "INCIDENT_START"]
+
+
+
+def test_rate_below_threshold_never_triggers():
+    detector = IncidentDetector(error_threshold=100, window_size=4, rate_threshold=0.5)
+    results = []
+    results.append(detector.process_event(1, "api", "SUCCESS"))  # 1 error, 0 success, total 1 < window
+    results.append(detector.process_event(2, "api", "SUCCESS"))  # 1 error, 1 success, total 2 < window
+    results.append(detector.process_event(3, "api", "SUCCESS"))  # 2 error, 2 success, total 4 == window, error rate = 0.5, should trigger
+    results.append(detector.process_event(4, "api", "ERROR"))  # 2 error, 1 success, total 3 < window
+    assert results == [None, None, None, None]
+    assert detector.service_states["api"]["incident_active"] is False
+
+def test_count_trigger_works_without_rate_params():
+    detector = IncidentDetector(error_threshold=2) # no window_size or rate_threshold
+    results = []
+    results.append(detector.process_event(1, "api", "ERROR"))
+    results.append(detector.process_event(2, "api", "ERROR"))
+    assert results == [None, "INCIDENT_START"]

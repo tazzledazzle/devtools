@@ -10,13 +10,16 @@ Part 4: persistence/re-triggering — don't spam duplicate alerts, but do re-ale
 
 
 class IncidentDetector:
-    def __init__(self, error_threshold: int, window_size: int=None):
+    def __init__(self, error_threshold: int, window_size: int=None, rate_threshold: float=None):
         """
         error_threshold: int, raw count of errors that triggers an incident
         window_size: declared now, unused in Part 1, but will be used in Part 2 for rate-based detection
+        rate_threshold: float, e.g. 0.5 means 50% error rate triggers an incident.
+                        Only evaluated once total events (error+success) >= window_size
         """
         self.error_threshold = error_threshold
         self.window_size = window_size
+        self.rate_threshold = rate_threshold
         # per-service state goes here
         self.service_states = {}
 
@@ -38,18 +41,32 @@ class IncidentDetector:
 
     def _check_for_incident_start(self, service):
         state = self.service_states[service]
-        if not state["incident_active"] and state["error_count"] >= self.error_threshold:
+
+        if state["incident_active"]:
+            return None  # already in an incident, don't re-trigger
+
+        count_triggered = state["error_count"] >= self.error_threshold
+        rate_triggered = False
+        if self.rate_threshold is not None and self.window_size is not None:
+            total_events = state["error_count"] + state["success_count"]
+            if total_events >= self.window_size:
+                error_rate = state["error_count"] / total_events
+                rate_triggered = error_rate >= self.rate_threshold
+
+        if count_triggered or rate_triggered:
             state["incident_active"] = True
             return "INCIDENT_START"
         return None
+
     def process_event(self, timestamp, service, status: str):
         """
         Returns 'INCIDENT_START', None, or later 'INCIDENT_RESOLVED'
         """
         if status == "ERROR":
             self._increment_error_count(service)
-            return self._check_for_incident_start(service)
         elif status == "SUCCESS":
             self._increment_success_count(service)
+        else:
+            # Ignore unknown status
             return None
-        return None
+        return self._check_for_incident_start(service)
