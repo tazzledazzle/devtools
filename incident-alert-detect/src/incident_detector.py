@@ -58,15 +58,40 @@ class IncidentDetector:
             return "INCIDENT_START"
         return None
 
+    def _check_for_incident_resolution(self, service):
+        state = self.service_states[service]
+
+        if not state["incident_active"]:
+            return None  # no incident to resolve
+
+        if self.rate_threshold is None or self.window_size is None:
+            # No rate mechanism configured -> a raw-count-triggered incident
+            # has no way to resolve, since error_count never decreases.
+            return None
+
+        total_events = state["error_count"] + state["success_count"]
+        if total_events == 0:
+            return None
+
+        error_rate = state["error_count"] / total_events
+        if error_rate < self.rate_threshold:
+            state["incident_active"] = False
+            return "INCIDENT_RESOLVED"
+        return None
+
     def process_event(self, timestamp, service, status: str):
         """
-        Returns 'INCIDENT_START', None, or later 'INCIDENT_RESOLVED'
+        Returns "INCIDENT_START" if incident triggered, "INCIDENT_RESOLVED" if incident resolved, or None otherwise.
         """
         if status == "ERROR":
             self._increment_error_count(service)
         elif status == "SUCCESS":
             self._increment_success_count(service)
         else:
-            # Ignore unknown status
             return None
-        return self._check_for_incident_start(service)
+
+        start_result = self._check_for_incident_start(service)
+        if start_result is not None:
+            return start_result
+
+        return self._check_for_incident_resolution(service)
