@@ -135,4 +135,23 @@ class SubscriptionScheduler:
         current_end  Subscription end day before this change.
         start        Original subscription start day (used by _event_day).
         """
-        pass
+        events = [e for e in events if e.day < cd]  # Cancel stale events
+        if "new_plan" in change:
+            new_plan = change["new_plan"]
+            new_end = current_end
+            events.append(EmailEvent(cd, "Changed", name, new_plan))
+        elif "extension" in change:
+            new_plan = current_plan
+            new_end = current_end + change["extension"]
+            events.append(EmailEvent(cd, "Renewed", name, new_plan))
+        else:
+            raise ValueError("Change must have either 'new_plan' or 'extension'.")
+
+        # Re-schedule future events
+        for offset, email_type in self.send_schedule.items():
+            if offset == "start":
+                continue  # Skip start events
+            event_day = _event_day(offset, start, new_end)
+            if event_day >= cd:
+                events.append(EmailEvent(event_day, email_type, name, new_plan))
+        return events, new_plan, new_end
