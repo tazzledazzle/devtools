@@ -79,3 +79,27 @@ def test_count_trigger_works_without_rate_params():
     results.append(detector.process_event(1, "api", "ERROR"))
     results.append(detector.process_event(2, "api", "ERROR"))
     assert results == [None, "INCIDENT_START"]
+
+
+def test_incident_resolves_when_rate_drops():
+    detector = IncidentDetector(error_threshold=100, window_size=2, rate_threshold=0.5)
+    results = []
+    results.append(detector.process_event(1, "api", "ERROR"))  # 1 error, 0 success, total 1 < window
+    results.append(detector.process_event(2, "api", "ERROR"))  # 2 error, 0 success, total 2 < window
+    results.append(detector.process_event(3, "api", "SUCCESS"))  # 2 error, 1 success, total 3 < window
+    results.append(detector.process_event(4, "api", "SUCCESS"))  # 2 error, 2 success, total 4 == window, error rate = 0.5, should trigger
+    results.append(detector.process_event(5, "api", "SUCCESS"))  # 2 error, 3 success, total 5 > window, error rate = 0.4 < threshold -> should resolve
+    assert results == [None, "INCIDENT_START", None, None,  "INCIDENT_RESOLVED"]
+    assert detector.service_states["api"]["incident_active"] is False
+
+
+def test_count_triggered_incident_never_resolves_without_rate_config():
+    detector = IncidentDetector(error_threshold=2) # no window_size or rate_threshold
+    results = []
+    results.append(detector.process_event(1, "api", "ERROR"))
+    results.append(detector.process_event(2, "api", "ERROR"))  # starts incident
+    results.append(detector.process_event(3, "api", "SUCCESS"))
+    results.append(detector.process_event(4, "api", "SUCCESS"))
+    results.append(detector.process_event(5, "api", "SUCCESS"))
+    assert results == [None, "INCIDENT_START", None, None, None]
+    assert detector.service_states["api"]["incident_active"] is True
