@@ -311,3 +311,12 @@ def kruskal_mst(graph):
 
     return mst_edges
 
+
+class CachedResult:
+    def __init__(self, response: str, expires_at:):
+        self.result = result
+        self.timestamp = time.time()
+
+    def is_expired(self, expiration_time):
+        return (time.time() - self.timestamp) > expiration_time
+
