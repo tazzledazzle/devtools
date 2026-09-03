@@ -11,7 +11,7 @@ All use `python:3.13-slim`, copy the repo, and `pip install -e .`.
 ## Build
 
 ```bash
-# From repo root (code-helper/)
+# From repo root
 docker build -f Dockerfile.crew_api -t code-helper-crew .
 docker build -f Dockerfile.runner   -t code-helper-runner .
 docker build -f Dockerfile.ingest   -t code-helper-ingest .

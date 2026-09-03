@@ -79,7 +79,7 @@
 - Safe modification: Prefer async tool API if CrewAI supports it; or ensure RunnerTool is only invoked from sync context. Tests inject execute_sync to avoid asyncio.run.
 
 **Chat UI CORS and API base:**
-- Files: `code-helper/chat_ui/app.js`, `chat_ui/README.md`
+- Files: `chat_ui/app.js`, `chat_ui/README.md`
 - Why fragile: Serving from different origin than crew_api requires CORS on crew_api; API base is query param or global; no error handling for network/CORS in UI.
 - Safe modification: Add CORS middleware to crew_api if needed; document CORS for deployers; optional fallback message in UI on fetch failure.
 
@@ -135,7 +135,7 @@
 
 **Chat UI:**
 - What's not tested: No automated tests for chat_ui (JS/HTML).
-- Files: `code-helper/chat_ui/`
+- Files: `chat_ui/`
 - Risk: UI regressions or API contract drift.
 - Priority: Low (minimal UI).
 

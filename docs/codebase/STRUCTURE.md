@@ -4,11 +4,13 @@
 
 ## Directory Layout
 
+The code-helper implementation lives at the **repo root**. The layout below shows paths relative to the repo root.
+
 ```
-code-helper/
-├── crew_api/           # FastAPI app + crew (agents, tasks, tools)
+./                          # repo root = code-helper project root
+├── crew_api/               # FastAPI app + crew (agents, tasks, tools)
 │   ├── crew/
-│   │   ├── tools/      # RAG, Search, Runner, stubs
+│   │   ├── tools/          # RAG, Search, Runner, stubs
 │   │   ├── agents.py
 │   │   ├── tasks.py
 │   │   └── crew.py
@@ -16,20 +18,20 @@ code-helper/
 │   ├── chat.py
 │   ├── runner_client.py
 │   └── ingest_job.py
-├── runner/             # FastAPI app for POST /execute
+├── runner/                 # FastAPI app for POST /execute
 │   └── app.py
-├── ingest/             # Chunk, embed, vector store
+├── ingest/                 # Chunk, embed, vector store
 │   ├── run.py
 │   ├── chunk.py
 │   ├── embed.py
 │   └── vector_store.py
-├── cli/                # code-helper CLI (run-tests, chat)
+├── cli/                    # code-helper CLI (run-tests, chat)
 │   └── main.py
-├── chat_ui/            # Static HTML/JS chat client
+├── chat_ui/                # Static HTML/JS chat client
 │   ├── index.html
 │   ├── app.js
 │   └── README.md
-├── k8s/                # Kubernetes manifests
+├── k8s/                    # Kubernetes manifests
 │   ├── namespace.yaml
 │   ├── configmap.yaml
 │   ├── services.yaml
@@ -38,7 +40,8 @@ code-helper/
 │   ├── vector-db-deployment.yaml
 │   ├── ingest-job.yaml
 │   └── ingress.yaml
-├── tests/              # Pytest tests
+├── docs/                   # Architecture, runbook, config, concerns
+├── tests/                  # Pytest tests
 ├── Dockerfile.crew_api
 ├── Dockerfile.runner
 ├── Dockerfile.ingest
@@ -48,10 +51,10 @@ code-helper/
 └── .python-version
 ```
 
-Repo root (pelotech) also contains:
-- `docs/` (e.g. `docs/plans/`, `docs/COREWEAVE_HERD_PROJECT_BRAINSTORM.md`)
-- `BYOP_PREP.md`, `RUN_INTERVIEW.md`
-- Other projects: `block-tor-exit-nodes/`, `trace-dependency-map/` (separate pyproject.toml each).
+The repo also contains these directories with no implementation:
+
+- `atlas-name-check/`, `bin-range-coverage/`, `card-validator/`, `fraud-detection/`, `incident-alert-detect/`, `subscription-notifications/` — empty scaffold (src/ and tests/ dirs, no Python files)
+- `cmake_to_bazel/`, `codebase-health-monitor/`, `maple-rewrite/`, `observability/`, `personal-copilot/`, `strip-stream/`, `cdk-libs/` — empty
 
 ## Directory Purposes
 

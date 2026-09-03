@@ -12,7 +12,7 @@ Crew API depends on **Runner** and **Chroma** (and optionally an LLM). Start the
 
 ### Docker Compose
 
-From `code-helper/`:
+From the repo root:
 
 ```bash
 # Start all (crew_api, runner, chroma)
@@ -32,7 +32,7 @@ From repo root (e.g. kind/minikube):
 
 ```bash
 # Apply all manifests (namespace, configmap, deployments, services)
-kubectl apply -f code-helper/k8s/
+kubectl apply -f k8s/
 
 # Load local images (kind)
 kind load docker-image code-helper-crew code-helper-runner code-helper-ingest --name <cluster-name>

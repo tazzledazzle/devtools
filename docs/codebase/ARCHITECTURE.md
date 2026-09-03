@@ -51,7 +51,7 @@
 
 **Chat UI:**
 - Purpose: Minimal browser client for POST /chat (and optional project_path).
-- Location: `code-helper/chat_ui/`
+- Location: `chat_ui/`
 - Contains: `index.html`, `app.js` (fetch to CODE_HELPER_API or ?api=), no build step.
 - Depends on: Crew API base URL (env or query param).
 - Used by: End users (serve via `python3 -m http.server 3000`).

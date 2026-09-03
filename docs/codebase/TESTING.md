@@ -6,14 +6,14 @@
 
 **Runner:**
 - pytest with pytest-asyncio (asyncio_mode: auto).
-- Config: `code-helper/pyproject.toml` ([tool.pytest.ini_options] testpaths = ["tests"], pythonpath = ["."]).
+- Config: `pyproject.toml` ([tool.pytest.ini_options] testpaths = ["tests"], pythonpath = ["."]).
 
 **Assertion Library:**
 - Built-in assert; no separate assertion library.
 
 **Run Commands:**
 ```bash
-pytest                    # Run all tests (from code-helper root)
+pytest                    # Run all tests (from repo root)
 pytest tests/             # Same
 pytest -v                 # Verbose
 pytest tests/test_runner.py   # Single file

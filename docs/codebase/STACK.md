@@ -5,10 +5,10 @@
 ## Languages
 
 **Primary:**
-- Python 3.12–3.14 (required by `code-helper/pyproject.toml`); project uses 3.13 (`.python-version`: 3.13) for development and Docker images.
+- Python 3.12–3.14 (required by `pyproject.toml`); project uses 3.13 (`.python-version`: 3.13) for development and Docker images.
 
 **Secondary:**
-- JavaScript (vanilla) in `code-helper/chat_ui/` (app.js, index.html) for the minimal chat client; no framework or build step.
+- JavaScript (vanilla) in `chat_ui/` (app.js, index.html) for the minimal chat client; no framework or build step.
 
 ## Runtime
 
@@ -16,7 +16,7 @@
 - CPython 3.13 (slim base in Docker: `python:3.13-slim`).
 
 **Package Manager:**
-- pip + setuptools; optional lockfile via uv (`code-helper/uv.lock` present).
+- pip + setuptools; optional lockfile via uv (`uv.lock` present).
 - Install: `pip install -e .` (editable install from repo root).
 
 ## Frameworks
@@ -53,7 +53,7 @@
 - Key env vars: `RUNNER_URL`, `VECTOR_DB_URL`/`CHROMA_URL`, `ALLOWED_ROOT`, `K8S_NAMESPACE`, `INGEST_IMAGE`, `CREWAI_STORAGE_DIR`, `CODE_HELPER_API_URL`, `TAVILY_API_KEY`, `SERPER_API_KEY`, `LLM_URL` (referenced in k8s ConfigMap).
 
 **Build:**
-- `code-helper/pyproject.toml` – project definition, scripts (`code-helper = "cli.main:main"`), setuptools package find (runner, ingest, crew_api, cli), pytest options (asyncio_mode, testpaths, pythonpath).
+- `pyproject.toml` – project definition, scripts (`code-helper = "cli.main:main"`), setuptools package find (runner, ingest, crew_api, cli), pytest options (asyncio_mode, testpaths, pythonpath).
 
 ## Platform Requirements
 
@@ -61,7 +61,7 @@
 - Python 3.12–3.14; recommended 3.13. Optional: Ollama for local embeddings/LLM; Tavily or Serper API keys for live web search.
 
 **Production:**
-- Deployable via Docker (Dockerfile.crew_api, Dockerfile.runner, Dockerfile.ingest) and Kubernetes manifests in `code-helper/k8s/` (namespace, configmap, deployments for crew-api, runner, vector-db, ingest Job template, services, ingress).
+- Deployable via Docker (Dockerfile.crew_api, Dockerfile.runner, Dockerfile.ingest) and Kubernetes manifests in `k8s/` (namespace, configmap, deployments for crew-api, runner, vector-db, ingest Job template, services, ingress).
 
 ---
 

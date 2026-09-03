@@ -47,7 +47,7 @@
 - Docker Compose (crew_api, runner, chroma; optional ollama). Kubernetes: namespace `code-helper`, deployments for crew-api, runner, chroma; Job template for ingest; ConfigMap for env.
 
 **CI Pipeline:**
-- Not detected in code-helper (no `.github/workflows` in code-helper; block-tor-exit-nodes has GitHub Actions).
+- Not present (no `.github/workflows` directory in this repo).
 
 ## Environment Configuration
 
